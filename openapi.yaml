@@ -1,0 +1,443 @@
+openapi: 3.0.0
+info:
+  title: 'flowermate-api'
+  description: '本api设计较为简陋，并不完全符合restful api规范，仅供练习参考'
+  version: '1.0.0'
+
+servers:
+  - url: /api
+
+security:
+  - auth: []
+
+components:
+  securitySchemes:
+    auth:
+      type: http
+      scheme: bearer
+
+paths:
+  /user:
+    post:
+      security: []
+      summary: 注册用户
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                pwd:
+                  type: string
+                  format: password
+              required:
+                - username
+                - email
+                - pwd
+      responses:
+        200:
+          content:
+            application/json:
+              schema:       
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      token:
+                        type: string
+
+  /user/{id}:
+    put:
+      summary: 更新用户
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 用户id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                avatar:
+                  type: integer
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                pwd:
+                  type: string
+                  format: password
+      responses:
+        200:
+          content:
+            application/json:
+              schema:       
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+
+  /login:
+    post:
+      security: []
+      summary: 登录
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                pwd:
+                  type: string
+                  format: password
+              required:
+                - username
+                - pwd    
+      responses:
+        200:
+          content:
+            application/json:
+              schema:       
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      token:
+                        type: string
+                      avatar:
+                        type: integer
+
+  /file:
+    post:
+      summary: 上传文件，返回文件id
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: integer
+   
+  /file/{id}:
+    get:
+      summary: 返回指定id对应的文件
+      parameters:
+        - in: path
+          name: id   
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: 文件id
+      responses:
+        200:
+          content:
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+  /feed:
+    post:
+      summary: 发表动态
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                desc:
+                  type: string
+                images:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id: 
+                        type: integer
+                      images: 
+                        type: array
+                        items:
+                          type: integer
+                      desc: 
+                        type: string
+                      userId: 
+                        type: integer
+    get:
+      summary: 获取动态列表
+      parameters:
+        - in: query
+          name: offset   
+          required: true
+          schema:
+            type: integer
+          description: 分页起始值
+        - in: query
+          name: limit   
+          required: true
+          schema:
+            type: integer
+          description: 分页每页数量
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: integer
+                            images: 
+                              type: array
+                              items:
+                                type: integer
+                            desc: 
+                              type: string
+                            userId: 
+                              type: integer
+                            feedLikes:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  userId:
+                                    type: string
+  
+  /feedlike:
+    post:
+      summary: 点赞/取消点赞
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [like, unlike]
+                  description: 点赞或取消点赞的动作
+                feedId:
+                  type: integer
+                  description: 点赞/取消点赞的动态id
+              required:
+                - action
+                - feedId
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+
+  /location:
+    get:
+      summary: 根据当前地理位置获取附近的鉴定记录
+      parameters:
+        - in: query
+          name: lon   
+          required: true
+          schema:
+            type: number
+          description: 中心点经度
+        - in: query
+          name: lat   
+          required: true
+          schema:
+            type: number
+          description: 中心点纬度
+        - in: query
+          name: lonDelta   
+          required: true
+          schema:
+            type: number
+          description: 经度范围
+        - in: query
+          name: latDelta  
+          required: true
+          schema:
+            type: number
+          description: 纬度范围
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: 
+                          type: integer
+                        image: 
+                          type: integer
+                        lon: 
+                          type: number
+                        lat: 
+                          type: number
+                        extra:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            score:
+                              type: string
+                            baike_info:
+                              nullable: true
+                              type: object
+                              properties:
+                                image_url: 
+                                  type: string
+                                baike_url:
+                                  type: string
+
+  /report:
+    post:
+      summary: 提交植物鉴定
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: integer
+                lon: 
+                  type: number
+                lat: 
+                  type: number
+              required:
+                - image
+                - lon
+                - lat
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+    get:
+      summary: 获取我的鉴定列表
+      parameters:
+        - in: query
+          name: offset   
+          required: true
+          schema:
+            type: integer
+          description: 分页起始值
+        - in: query
+          name: limit   
+          required: true
+          schema:
+            type: integer
+          description: 分页每页数量
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id: 
+                        type: integer
+                      image: 
+                        type: integer
+                      lon: 
+                        type: number
+                      lat: 
+                        type: number
+                      extra:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          score:
+                            type: string
+                          baike_info:
+                            nullable: true
+                            type: object
+                            properties:
+                              image_url: 
+                                type: string
+                              baike_url:
+                                type: string
+
+
+
+
