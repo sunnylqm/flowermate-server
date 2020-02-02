@@ -39,7 +39,7 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "egg-scripts start --port=80 --title=egg-server-flowermate",
+    "start": "egg-scripts start --port=9000 --title=egg-server-flowermate",
     "stop": "egg-scripts stop --title=egg-server-flowermate",
     "dev": "egg-bin dev",
     "debug": "egg-bin debug",
