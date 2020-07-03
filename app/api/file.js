@@ -1,8 +1,8 @@
-const { pass, error } = require("../utils/apiHelper");
+const { pass, error } = require('../utils/apiHelper');
 
-exports.create = async function() {
+exports.create = async function () {
   const ctx = this;
-  const { tag } = ctx.request.query;
+  const { tag = 'uncategorized' } = ctx.request.query;
   const files = ctx.request.files || [];
   if (files.length) {
     const file = files[0];
@@ -19,7 +19,7 @@ exports.create = async function() {
   }
 };
 
-exports.show = async function() {
+exports.show = async function () {
   const ctx = this;
   const { id: fileId } = this.params;
   const filePath = await ctx.service.fileService.getPublicPath(fileId);
