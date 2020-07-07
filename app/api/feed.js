@@ -22,12 +22,12 @@ exports.index = async function() {
       },
     ],
   };
-  // if (userId) {
-  //   if (userId != ctx.accessToken.id) {
-  //     return (ctx.body = error('无权限'));
-  //   }
-  //   dbQuery.where.userId = userId;
-  // }
+  if (userId) {
+    if (userId !== ctx.accessToken.id) {
+      return (ctx.body = error('无权限'));
+    }
+    dbQuery.where.userId = userId;
+  }
   const result = await ctx.service.feedService.findAndCountAll(dbQuery);
   ctx.body = pass(result);
 };
