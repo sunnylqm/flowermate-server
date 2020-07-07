@@ -1,7 +1,7 @@
 const { pass, error } = require('../utils/apiHelper');
 const _ = require('lodash');
 
-exports.index = async function() {
+exports.index = async function () {
   const ctx = this;
   const { offset, limit, userId } = ctx.request.query;
   const dbQuery = {
@@ -23,7 +23,7 @@ exports.index = async function() {
     ],
   };
   if (userId) {
-    if (userId !== ctx.accessToken.id) {
+    if (userId != ctx.accessToken.id) {
       return (ctx.body = error('无权限'));
     }
     dbQuery.where.userId = userId;
@@ -32,7 +32,7 @@ exports.index = async function() {
   ctx.body = pass(result);
 };
 
-exports.create = async function() {
+exports.create = async function () {
   const ctx = this;
   const { desc, images } = ctx.request.body;
   const userId = ctx.accessToken.id;
