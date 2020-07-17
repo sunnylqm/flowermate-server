@@ -19,7 +19,7 @@ class LocationService extends Service {
     latDelta = parseFloat(latDelta);
     checkParams({ lon, lat, lonDelta, latDelta });
     return ctx.service.reportService.findAll({
-      attributes: ['id', 'image', 'lon', 'lat', 'extra'],
+      attributes: ['id', 'image', 'lon', 'lat', 'extra', 'createdAt'],
       where: {
         type: 'plant',
         lon: {
